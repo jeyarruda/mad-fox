@@ -2,9 +2,9 @@ create schema madfox_bd;
 
 use madfox_bd; 
 
-create user 'root'@'localhost' indetified by 'development'
+CREATE USER 'root'@'%' IDENTIFIED BY 'development';
 
-grant all privileges on madfox_bd.* to root@'localhost'
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
 
 
 create table user (
