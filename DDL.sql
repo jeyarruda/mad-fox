@@ -27,6 +27,6 @@ create table user_authorizer (
     user_id varchar(16) not null, 
     authorizer_id bigint unsigned not null, 
     primary key (user_id, authorizer_id), 
-    foreign key auth_user_fk (user_id) references id (user)
+    foreign key auth_user_fk (user_id) references id (user),
     foreign key auth_authorizer_fk (authorizer_id) references id (authorizer)
 );
