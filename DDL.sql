@@ -9,18 +9,18 @@ grant all privileges on madfox_bd.* to root@'localhost'
 
 create table user (
     id varchar(16) not null,
-    name varchar(50) not null, 
+    username varchar(50) not null, 
     nickname varchar(20) not null, 
-    password varchar(50) not null, 
+    user_password varchar(50) not null, 
     primary key(id), 
     unique key uni_user_nickname (nickname)
 );
 
 create table authorizer (
     id bigint unsigned not null auto_increment, 
-    name varchar(20) not null, 
+    authname varchar(20) not null, 
     primary key(id), 
-    unique key uni_authorizer_name (name)
+    unique key uni_authorizer_name (authname)
 );
 
 create table user_authorizer (
