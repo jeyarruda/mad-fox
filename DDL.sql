@@ -1,11 +1,10 @@
-create schema madfox_bd; 
+create schema madfox_db; 
 
-use madfox_bd; 
+use madfox_db; 
 
 CREATE USER 'user'@'localhost' IDENTIFIED BY 'development';
 
-GRANT select, insert, delete, update ON madfox_bd.* TO user@'localhost';
-
+GRANT ALL PRIVILEGES ON madfox_db.* TO 'user'@'localhost';
 
 create table user (
     id varchar(16) not null,
