@@ -3,8 +3,13 @@ package br.com.madfox.service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +29,9 @@ public class SecurityServiceImpl implements SecurityService {
     @Autowired
     private UserRepository userRepo;
 
+    @Autowired
+    private PasswordEncoder pwdEncoder;
+
     @Transactional
     @Override
     public User registerUser(String username, String nickname, String password, String authorization) {
@@ -36,7 +44,7 @@ public class SecurityServiceImpl implements SecurityService {
         User user = new User();
         user.setNickname(nickname);
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(pwdEncoder.encode(password));
         user.setAuthorizations(new HashSet<Authorizer>());
         user.getAuthorizations().add(auth);
         userRepo.save(user);
@@ -44,11 +52,13 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public List<User> listAllUsers() {
         return userRepo.findAll();
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public User findUserById(Long id) {
         Optional<User> userOp = userRepo.findById(id);
         if(userOp.isPresent()){
@@ -58,6 +68,7 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public User findUserByNickname(String nickname) {
         User user = userRepo.findByNickname(nickname);
         if(user != null){
@@ -67,12 +78,26 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public Authorizer findAuthByAuthname(String authname) {
         Authorizer authorizer = authRepo.findByAuthname(authname);
         if(authorizer != null){
             return authorizer;
         }
         throw new NotFoundException("Autorização não encontrada"); 
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepo.findByNickname(username);
+        if(user == null){
+            throw new UsernameNotFoundException("Usuário "+username+" não encontrado");
+        }
+        return org.springframework.security.core.userdetails.User.builder()
+            .username(username).password(user.getPassword())
+                .authorities(user.getAuthorizations().stream().map(Authorizer::getAuthname).collect(Collectors.toList())
+                .toArray(new String[user.getAuthorizations().size()]))
+            .build();
     }
 
 }

@@ -10,7 +10,7 @@ create table user (
     id bigint unsigned not null auto_increment,
     username varchar(50) not null, 
     nickname varchar(20) not null, 
-    user_password varchar(50) not null, 
+    user_password varchar(255) not null, 
     primary key(id), 
     unique key uni_user_nickname (nickname)
 );

@@ -1,6 +1,7 @@
 package br.com.madfox.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.com.madfox.entity.Authorizer;
@@ -21,7 +22,7 @@ import javax.transaction.Transactional;
 public class PostServiceImpl implements PostService {
 
     @Autowired
-    private UserRepository userRepo; 
+    private UserRepository userRepo;
 
     @Autowired
     private PostRepository postRepo;
@@ -29,16 +30,17 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private AuthorizerRepository authRepo;
 
-    
+    @Autowired
+    private PasswordEncoder pwdEncoder;
 
     @Transactional
     @Override
     public Post registerPost(String content, String category, String nickname) {
         User user = userRepo.findByNickname(nickname);
-        if(user == null){
-            throw new NotFoundException("Usuário não encontrado");   
+        if (user == null) {
+            throw new NotFoundException("Usuário não encontrado");
         }
-        Post post  = new Post(); 
+        Post post = new Post();
         post.setUser(user);
         post.setTimePost(new java.util.Date());
         post.setCategory(category);
@@ -49,19 +51,20 @@ public class PostServiceImpl implements PostService {
 
     @Transactional
     @Override
-    public User getStarted(String username, String nickname, String password, String authorization, String content, String category){
+    public User getStarted(String username, String nickname, String password, String authorization, String content,
+            String category) {
         Authorizer auth = authRepo.findByAuthname(authorization);
         if (auth == null) {
             auth = new Authorizer();
             auth.setAuthname(authorization);
             authRepo.save(auth);
         }
-        
+
         User user = new User();
-        Post post = new Post(); 
+        Post post = new Post();
         user.setNickname(nickname);
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(pwdEncoder.encode(password));
         user.setAuthorizations(new HashSet<Authorizer>());
         user.getAuthorizations().add(auth);
         userRepo.save(user);
@@ -77,17 +80,17 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<Post> findPostsByUser(String nickname) {
         User user = userRepo.findByNickname(nickname);
-        if(user == null){
-            throw new NotFoundException("Usuário não encontrado");   
+        if (user == null) {
+            throw new NotFoundException("Usuário não encontrado");
         }
-        List<Post> posts  = postRepo.findPostsByUser(nickname); 
+        List<Post> posts = postRepo.findPostsByUser(nickname);
         return posts;
     }
 
     @Override
     public Post findPostById(Long id) {
         Optional<Post> post = postRepo.findById(id);
-        if(post.isPresent()){
+        if (post.isPresent()) {
             return post.get();
         }
         throw new NotFoundException("Post não encontrado");
@@ -95,10 +98,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post editPost(Post post, Post oldPost) {
-        if(post.getCategory() != null){
+        if (post.getCategory() != null) {
             oldPost.setCategory(post.getCategory());
         }
-        if(post.getContent() != null){
+        if (post.getContent() != null) {
             oldPost.setContent(post.getContent());
         }
         postRepo.save(oldPost);
@@ -109,7 +112,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public String deletePost(Long id) {
         Optional<Post> postOp = postRepo.findById(id);
-        if(postOp.isPresent()){
+        if (postOp.isPresent()) {
             postRepo.deletePost(id);
         }
         return "OK";
@@ -117,10 +120,8 @@ public class PostServiceImpl implements PostService {
 
     // @Override
     // public List<Post> findPostsBeforeDate(Date timePost) {
-    //     List<Post> posts = postRepo.findPostsBeforeDate(timePost);
-    //     return posts;
+    // List<Post> posts = postRepo.findPostsBeforeDate(timePost);
+    // return posts;
     // }
-
-
 
 }
