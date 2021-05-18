@@ -48,6 +48,12 @@ public class PostController {
     }
 
     @JsonView(View.PostComplete.class)
+    @GetMapping(value="/all")
+    public List<Post> getPosts() {
+        return postService.getPosts();
+    }
+
+    @JsonView(View.PostComplete.class)
     @PutMapping(value = "/{id}")
     public ResponseEntity<Post> editPostById(@RequestBody Post post, @PathVariable("id") Long id) {
         Post oldPost = postService.findPostById(id);

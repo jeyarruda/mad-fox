@@ -33,7 +33,7 @@ public class User {
     @Column(name = "username")
     private String username;
 
-    @JsonView(View.UserSummary.class)
+    @JsonView({View.UserSummary.class, View.PostSummary.class})
     @Column(name = "nickname")
     private String nickname;
 

@@ -10,6 +10,8 @@ public interface PostService {
 
     public List<Post> findPostsByUser(String nickname); 
 
+    public List<Post>getPosts();
+
     public Post findPostById(Long id); 
 
     public Post editPost(Post post, Post oldPost);

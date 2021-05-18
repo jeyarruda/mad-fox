@@ -20,6 +20,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select p from Post p join p.user u where u.nickname = ?1 and p.category = ?2")
     public List<Post> findPostsByUserAndCategory(String nickname, String category); 
 
+    @Query("select p from Post p order by p.timePost desc")
+    public List<Post> getPosts(); 
+
 
     @Modifying
     @Query("delete from Post p where p.id = ?1")

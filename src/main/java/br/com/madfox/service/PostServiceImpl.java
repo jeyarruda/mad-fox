@@ -88,6 +88,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<Post> getPosts() {
+        List<Post> posts = postRepo.getPosts();
+        return posts;
+    }
+
+
+    @Override
     public Post findPostById(Long id) {
         Optional<Post> post = postRepo.findById(id);
         if (post.isPresent()) {
